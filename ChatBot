@@ -1,1 +1,89 @@
+import java.util.*;
+import java.util.regex.*;
 
+class Intent {
+    Pattern pattern;
+    List<String> responses;
+
+    public Intent(String regex, List<String> responses) {
+        this.pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+        this.responses = responses;
+    }
+
+    public boolean matches(String input) {
+        return pattern.matcher(input).find();
+    }
+
+    public String getResponse() {
+        Random rand = new Random();
+        return responses.get(rand.nextInt(responses.size()));
+    }
+}
+
+public class ChatBot {
+    static List<Intent> intents = new ArrayList<>();
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        // Load intents
+        intents.add(new Intent("hi|hello|hey", Arrays.asList(
+                "Hello!",
+                "Hey there!",
+                "Hi, how can I help you?"
+        )));
+
+        intents.add(new Intent("how are you", Arrays.asList(
+                "I'm functioning perfectly!",
+                "All systems running smoothly.",
+                "Doing great! What about you?"
+        )));
+
+        intents.add(new Intent("your name", Arrays.asList(
+                "I'm an advanced Java chatbot.",
+                "You can call me JavaBot."
+        )));
+
+        intents.add(new Intent("weather", Arrays.asList(
+                "I can't fetch live weather yet, but it's always a good day to code!",
+                "Try checking a weather app for real-time updates."
+        )));
+
+        intents.add(new Intent("time", Arrays.asList(
+                "Current time: " + java.time.LocalTime.now().withNano(0)
+        )));
+
+        intents.add(new Intent("bye|exit", Arrays.asList(
+                "Goodbye!",
+                "See you later!",
+                "Exiting... Have a great day!"
+        )));
+
+        System.out.println("Advanced ChatBot: Hello! Type 'bye' to exit.");
+
+        while (true) {
+            System.out.print("You: ");
+            String input = sc.nextLine();
+
+            boolean matched = false;
+
+            for (Intent intent : intents) {
+                if (intent.matches(input)) {
+                    String response = intent.getResponse();
+                    System.out.println("Bot: " + response);
+                    matched = true;
+
+                    if (input.toLowerCase().matches("bye|exit")) {
+                        sc.close();
+                        return;
+                    }
+                    break;
+                }
+            }
+
+            if (!matched) {
+                System.out.println("Bot: I’m not sure I understand. Can you rephrase?");
+            }
+        }
+    }
+}
